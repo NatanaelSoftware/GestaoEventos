@@ -35,6 +35,7 @@ public class Menu {
             System.out.println("4 - Cancelar ingresso");
             System.out.println("5 - Validar ingresso");
             System.out.println("6 - Relatórios");
+            System.out.println("7 - Atualizar evento");
             System.out.println("0 - Sair");
             System.out.println("========================================");
             System.out.print("Escolha uma opção: ");
@@ -60,6 +61,9 @@ public class Menu {
                 case 6:
                     exibirRelatorios();
                     break;
+                case 7:
+                    atualizarEvento();
+                    break;
                 case 0:
                     System.out.println("Saindo do sistema... Até logo!");
                     break;
@@ -73,7 +77,7 @@ public class Menu {
     }
 
     private void cadastrarEvento() {
-
+        limparTela();
 
         System.out.println("\n--- CADASTRAR EVENTO ---");
 
@@ -90,7 +94,7 @@ public class Menu {
         String horatioTexto = scanner.nextLine();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        LocalDateTime data  = LocalDateTime.parse (dataTexto + " " + horatioTexto, formatter);
+        LocalDateTime data = LocalDateTime.parse(dataTexto + " " + horatioTexto, formatter);
 
         System.out.print("Capacidade máxima: ");
         int capacidade = lerInteiro();
@@ -104,18 +108,25 @@ public class Menu {
         } catch (Exception e) {
             System.out.println("Erro ao cadastrar evento: " + e.getMessage());
         }
+
+        System.out.print("Pressione Enter para continuar...");
+        scanner.nextLine();
     }
 
     private void listarEventos() {
+        limparTela();
         System.out.println("\n--- LISTA DE EVENTOS ---");
         try {
             eventoController.listarEventos();
         } catch (Exception e) {
             System.out.println("Erro ao listar eventos: " + e.getMessage());
         }
+        System.out.print("Pressione Enter para continuar...");
+        scanner.nextLine();
     }
 
     private void emitirIngresso() {
+        limparTela();
         System.out.println("\n--- EMITIR INGRESSO ---");
 
         System.out.print("ID do evento: ");
@@ -139,41 +150,54 @@ public class Menu {
         try {
             String tipoIngresso = (tipo == 1) ? "INTEIRA" : "MEIA";
             ingressoController.emitirIngresso(idEvento, nomeParticipante, tipoIngresso, comprovante);
-            System.out.println("Ingresso emitido com sucesso!");
         } catch (Exception e) {
             System.out.println("Erro ao emitir ingresso: " + e.getMessage());
         }
+
+        System.out.print("Pressione Enter para continuar...");
+        scanner.nextLine();
     }
 
     private void cancelarIngresso() {
+        limparTela();
         System.out.println("\n--- CANCELAR INGRESSO ---");
 
         System.out.print("ID do ingresso: ");
         int idIngresso = lerInteiro();
 
+
         try {
             ingressoController.cancelarIngresso(idIngresso);
-            System.out.println("Ingresso cancelado com sucesso!");
         } catch (Exception e) {
             System.out.println("Erro ao cancelar ingresso: " + e.getMessage());
         }
+
+        System.out.print("Pressione Enter para continuar...");
+        scanner.nextLine();
     }
 
     private void validarIngresso() {
+        limparTela();
         System.out.println("\n--- VALIDAR INGRESSO ---");
 
         System.out.print("ID do ingresso: ");
         int idIngresso = lerInteiro();
 
+        System.out.print("Nome do operador: ");
+        String operador = scanner.nextLine();
+
         try {
-            validacaoController.validarIngresso(idIngresso);
-            System.out.println("Ingresso validado com sucesso!");
+            validacaoController.validarIngresso(idIngresso, operador);
         } catch (Exception e) {
             System.out.println("Erro ao validar ingresso: " + e.getMessage());
         }
+
+        System.out.print("Pressione Enter para continuar...");
+        scanner.nextLine();
     }
 
     private void exibirRelatorios() {
+        limparTela();
         int opcao;
         do {
             System.out.println("\n--- RELATÓRIOS ---");
@@ -243,4 +267,50 @@ public class Menu {
             }
         }
     }
+
+    private void atualizarEvento() {
+        limparTela();
+        try {
+            System.out.println("\n--- ATUALIZAR EVENTO ---");
+            System.out.print("ID do evento: ");
+                int id = lerInteiro();
+
+            System.out.println("1 - Cancelar evento");
+            System.out.println("2 - Encerrar evento");
+            System.out.print("Escolha: " );
+            int escolha = lerInteiro();
+
+            String status = "";
+            switch (escolha) {
+                case 1:
+                    status = "CANCELADO";
+                    break;
+                case 2:
+                    status = "ENCERRADO";
+                    break;
+                default:
+                    System.out.println("Opção invalida!");
+                    return;
+            }
+            eventoController.atualizarStatusEvento(id, status);
+        }catch (Exception e) {
+            System.out.println("Erro ao atualizar o evento!" + e.getMessage());
+        }
+
+        System.out.println("Pressione Enter para continuar...");
+        scanner.nextLine();
+    }
+
+    private void limparTela() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                new ProcessBuilder("clear").inheritIO().start().waitFor();
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao limpar a tela");
+        }
+    }
+
 }
